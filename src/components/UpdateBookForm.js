@@ -1,24 +1,35 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 
 const UpdateBookForm = ({ book }) => {
   const [title, setTitle] = useState(book.title);
   const [author, setAuthor] = useState(book.author);
   const [showForm, setShowForm] = useState(false); // State variable to control form visibility
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
-    try {
-      await axios.put(`http://localhost:8080/books/update/${book.id}`, {
+
+    fetch(`http://localhost:8080/books/update/${book.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
         title,
         author,
+      }),
+    })
+      .then(response => {
+        if (response.ok) {
+          alert('Book updated successfully');
+          setShowForm(false); // Close the form after the update
+        } else {
+          throw new Error('Failed to update book');
+        }
+      })
+      .catch(error => {
+        console.error(error);
+        alert('Failed to update book');
       });
-      alert('Book updated successfully');
-      setShowForm(false); // Close the form after the update
-    } catch (error) {
-      console.error(error);
-      alert('Failed to update book');
-    }
   };
 
   const handleUpdateClick = () => {
